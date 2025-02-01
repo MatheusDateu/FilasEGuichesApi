@@ -50,10 +50,19 @@ namespace FilasEGuichesApi.Data
                     new TipoGuiche { Id = 1, Nome = "Atendimento", Prefixo = "A" },
                     new TipoGuiche { Id = 2, Nome = "Gerencia", Prefixo = "G" }
                 );
-
-                SaveChanges();
             }
+
+            if (!Guiches.Any())
+            {
+                Guiches.AddRange(
+                    new Guiche { Id = 1, TipoGuicheId = 1 },
+                    new Guiche { Id = 2, TipoGuicheId = 2 }
+                );
+            }
+
+            SaveChanges();
         }
+
 
         #endregion
 
