@@ -1,5 +1,7 @@
-﻿using FilasEGuichesApi.Data.Repository;
+﻿using FilasEGuichesApi.Data;
+using FilasEGuichesApi.Data.Repository;
 using FilasEGuichesApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilasEGuichesApi.Services
 {
@@ -12,6 +14,7 @@ namespace FilasEGuichesApi.Services
         private readonly ICrudRepository<Ficha> _fichaRepository;
         private readonly ICrudRepository<Guiche> _guicheRepository;
         private readonly ICrudRepository<TipoGuiche> _tipoGuicheRepository;
+        private readonly AppDbContext _context;
 
         #endregion
 
@@ -22,11 +25,13 @@ namespace FilasEGuichesApi.Services
         public FichaService(
             ICrudRepository<Ficha> fichaRepository,
             ICrudRepository<Guiche> guicheRepository,
-            ICrudRepository<TipoGuiche> tipoGuicheRepository)
+            ICrudRepository<TipoGuiche> tipoGuicheRepository,
+            AppDbContext context)
         {
             _fichaRepository = fichaRepository;
             _guicheRepository = guicheRepository;
             _tipoGuicheRepository = tipoGuicheRepository;
+            _context = context;
         }
 
         #endregion
@@ -48,12 +53,13 @@ namespace FilasEGuichesApi.Services
             var tipoGuiche = await _tipoGuicheRepository.ObterPorIdAsync(guicheId);
             if (tipoGuiche == null) throw new KeyNotFoundException("Tipo de Guichê não encontrado.");
 
-            // Obter a última ficha gerada para esse tipo de guichê
-            var ultimasFichas = await _fichaRepository.ObterTodosAsync();
-            var ultimaFicha = ultimasFichas
-                .Where(f => f.Guiche.TipoGuicheId == tipoGuiche.Id)
+            // Buscar diretamente a última ficha do banco de dados
+            var ultimaFicha = await _context.Fichas
+                .Include(f => f.Guiche)
+                .ThenInclude(g => g.TipoGuiche) // Certificar que TipoGuiche também está carregado
+                .Where(f => f.GuicheId == guicheId) // Filtrar por GuicheId
                 .OrderByDescending(f => f.Codigo)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             // Gerar o próximo código da ficha
             int proximoNumero = 1;

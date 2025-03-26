@@ -22,6 +22,14 @@ namespace FilasEGuichesApi.Controllers
             return Ok(await _guicheService.ObterTodosAsync());
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Guiche>> ObterPorId(int id)
+        {
+            var guiche = await _guicheService.ObterPorIdAsync(id);
+            if (guiche == null) return NotFound();
+            return Ok(guiche);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Guiche>> CriarGuiche(GuicheCriacaoDto guiche)
         {
