@@ -51,7 +51,7 @@ namespace FilasEGuichesApi.Services
             // Obter a última ficha gerada para esse tipo de guichê
             var ultimasFichas = await _fichaRepository.ObterTodosAsync();
             var ultimaFicha = ultimasFichas
-                .Where(f => f.Guiche.TipoGuicheId == tipoGuiche.Id)
+                .Where(f => f.Guiche?.TipoGuicheId == tipoGuiche.Id)
                 .OrderByDescending(f => f.Codigo)
                 .FirstOrDefault();
 

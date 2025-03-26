@@ -19,7 +19,18 @@ namespace FilasEGuichesApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Guiche>>> ObterTodos()
         {
-            return Ok(await _guicheService.ObterTodosAsync());
+            var guiches = await _guicheService.ObterTodosAsync();
+
+            bool guicheEhNulo = guiches == null;
+            bool guichesEstaVazio = guiches.Any() == false; // 'existe algum item' é falso
+            bool noContent = guicheEhNulo || guichesEstaVazio;
+            
+            if (noContent) 
+            {
+                return NoContent();
+            }
+
+            return Ok(guiches);
         }
 
         [HttpPost]

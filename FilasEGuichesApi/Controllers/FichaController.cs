@@ -18,14 +18,30 @@ namespace FilasEGuichesApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Ficha>>> ObterTodas()
         {
-            return Ok(await _fichaService.ObterTodasAsync());
+            var fichas = await _fichaService.ObterTodasAsync();
+
+            bool fichasEhNulo = fichas is null;
+            bool fichasEstaVazio = fichas.Any() == false;
+            bool noContent = fichasEhNulo || fichasEstaVazio;
+
+            if (noContent)
+            {
+                return NoContent();
+            }
+
+            return Ok(fichas);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Ficha>> ObterPorId(int id)
         {
             var ficha = await _fichaService.ObterPorIdAsync(id);
-            if (ficha == null) return NotFound();
+            if (ficha == null)
+            {
+                var dentroDoEscopo = "dentro do if";
+                return NotFound();
+            }
+
             return Ok(ficha);
         }
 
